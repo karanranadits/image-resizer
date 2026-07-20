@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: image-resizer-backend
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./backend:/app
+    # Use restart policy to keep it running
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: image-resizer-frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - backend
+    restart: unless-stopped

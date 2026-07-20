@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exact Image Resizer</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="card">
+  <h1>Exact Image Resizer</h1>
+  <p class="subtitle">Compress an image to a precise target file size — down to the byte.</p>
+
+  <div class="dropzone" id="dropzone">
+    <div id="dropzoneContent">
+      <div class="hint">Click or drag an image here</div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="targetSize">Target size</label>
+      <input type="number" id="targetSize" min="0.01" step="0.01" value="200">
+    </div>
+    <div class="field">
+      <label for="unit">Unit</label>
+      <select id="unit">
+        <option value="KB" selected>KB</option>
+        <option value="MB">MB</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="format">Output format</label>
+      <select id="format">
+        <option value="jpeg" selected>JPEG (recommended)</option>
+        <option value="png">PNG</option>
+        <option value="webp">WebP</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="warning-box" id="formatWarning"></div>
+
+  <button id="submitBtn" disabled>
+    <span id="submitLabel">Select an image first</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="result" id="result">
+    <div class="result-row"><span class="label">Original size</span><span id="originalSize">—</span></div>
+    <div class="result-row"><span class="label">Target size</span><span id="targetSizeDisplay">—</span></div>
+    <div class="result-row"><span class="label">Achieved size</span><span id="achievedSize">—</span></div>
+    <div class="result-row"><span class="label">Match</span><span id="matchBadge">—</span></div>
+    <div id="resultWarnings"></div>
+    <button class="download-btn" id="downloadBtn">Download image</button>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
