@@ -25,7 +25,10 @@ backend/
 └── test_resizer.py          # Standalone test, no server needed
 
 frontend/
-└── index.html                # Single-file HTML/CSS/JS UI
+├── index.html               # Main UI
+├── styles.css               # Extracted CSS styles
+├── config.js                # Frontend configuration
+└── script.js                # Extracted JS logic
 ```
 
 **Why this shape:**
@@ -46,28 +49,30 @@ frontend/
 
 There's a hard floor on exactness: a JPEG COM segment needs at least 4 bytes of overhead, and a PNG chunk needs at least 12. So a 1–3 byte (JPEG) or 1–11 byte (PNG) gap can't be filled exactly — the tool rounds up slightly in that rare case rather than under-shooting.
 
-## Setup
+## Run with Docker (Recommended)
+
+The easiest way to run the application is using Docker Compose.
+
+```bash
+docker-compose up --build
+```
+
+- **Frontend** will be available at `http://localhost:8080`
+- **Backend API** will be running at `http://localhost:8002` (interactive docs at `http://localhost:8002/docs`)
+
+## Manual Setup
+
+### Run the backend
 
 ```bash
 cd backend
 pip install -r requirements.txt
+uvicorn main:app --reload --port 8002
 ```
 
-## Run the backend
+### Run the frontend
 
-```bash
-cd backend
-uvicorn main:app --reload --port 8000
-```
-
-API will be live at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
-
-## Run the frontend
-
-Just open `frontend/index.html` directly in a browser (double-click it, or
-serve it with any static file server). It's configured to call the API at
-`http://localhost:8000/api` — edit the `API_BASE` constant near the top of
-the `<script>` block in `index.html` if you deploy the backend elsewhere.
+Serve the `frontend/` directory with any static file server. It's configured to call the API at `http://localhost:8002/api`. To deploy the backend elsewhere, edit the `API_BASE` constant in `frontend/config.js`.
 
 ## Test the core engine without running a server
 
