@@ -49,6 +49,39 @@ frontend/
 
 There's a hard floor on exactness: a JPEG COM segment needs at least 4 bytes of overhead, and a PNG chunk needs at least 12. So a 1–3 byte (JPEG) or 1–11 byte (PNG) gap can't be filled exactly — the tool rounds up slightly in that rare case rather than under-shooting.
 
+## Complete Processing Flow (Function to Function)
+
+Here is a complete walkthrough of how the backend processes an image to hit an exact target file size:
+
+### 1. HTTP Entry Point (`backend/api/routes.py`)
+- **Function:** `resize_image(file, target_size, unit, output_format)`
+- The request hits the FastAPI router. It reads the uploaded file into raw bytes, converts the requested target size (e.g., 200 KB) into a precise target byte count (e.g., 204,800 bytes).
+- It packages this into a `ResizeRequest` and passes it to the `ResizerService`.
+
+### 2. Orchestration (`backend/services/resizer_service.py`)
+- **Function:** `ResizerService.resize(request)`
+- **Decode:** It takes the raw bytes and sends them to `image_codec.decode()` which safely opens the image using the Pillow (PIL) library.
+- **Pre-process:** It calls `_prepare_for_format()` which, for instance, strips out the alpha channel (transparency) if you requested a JPEG by flattening it onto a white background.
+- **Compress:** It gets the right `Compressor` strategy (JPEG, WebP, or PNG) from a factory and asks it to shrink the image so its size is *under or equal to* the target bytes.
+
+### 3. Step 1: Compression Strategy (`backend/services/compressor.py`)
+- **Function:** `QualityDialCompressor.compress(image, target_bytes)` (Used for JPEG and WebP)
+- The goal here is to get as close to the target byte size as possible *without going over*.
+- **Binary Search:** It calls `_search_quality()` which performs a binary search between quality `1` and `95`. In roughly 8 steps, it narrows down the absolute highest quality setting that keeps the encoded file size below the `target_bytes`.
+- **Downscaling:** If even the worst quality (`1`) is still too big for the target size, the loop scales down the image resolution by 10% (using `image_codec.resize()`) and tries the binary search again. It keeps shrinking the dimensions until it fits.
+- *Note for PNGs:* Since PNG is lossless and has no quality dial, the `PngCompressor` skips the binary search and purely relies on downscaling resolution by 10% steps until it fits.
+
+### 4. Step 2: Exact Byte Padding (`backend/services/padder.py`)
+- **Function:** `Padder.pad_to_exact(current_bytes, target_bytes)`
+- Once the compressor returns the image, it is usually slightly smaller than the exact target size. The `Padder` strategy fills the remaining gap with harmless "junk" data so the file size matches the target *down to the exact byte*, without changing how the image looks.
+- **For JPEGs (`JpegPadder`):** It dynamically generates a `COM` (comment) segment containing zero-bytes and injects it immediately after the file's Start-of-Image (SOI) marker. All image viewers ignore comment segments.
+- **For PNGs (`PngPadder`):** It generates a custom private ancillary chunk named `juNk` containing zero-bytes, and injects it right after the header block (IHDR). Standard image decoders safely skip unknown lowercase chunks.
+- **For WebPs:** Padding isn't implemented yet, so the `NullPadder` just returns the compressed bytes as-is and flags a warning that an exact match wasn't possible.
+
+### 5. Returning the Result (`backend/api/routes.py`)
+- The `ResizerService` returns a `ResizeResult` containing the final bytes, the achieved size, and boolean flags denoting if it achieved an exact match.
+- The router takes this object, embeds the stats inside a JSON string in the `X-Resize-Metadata` response header, and returns the modified image bytes directly as the HTTP response body so the user can download it instantly.
+
 ## Run with Docker (Recommended)
 
 The easiest way to run the application is using Docker Compose.
