@@ -34,7 +34,7 @@ def make_test_image(width=800, height=600) -> bytes:
 
 def run():
     source_bytes = make_test_image()
-    print(f"Test source image: {len(source_bytes)} bytes ({len(source_bytes)/1024:.1f} KB)\n")
+    print(f"Test source image: {len(source_bytes)} bytes ({len(source_bytes)/1000:.1f} KB)\n")
 
     service = ResizerService()
 

@@ -20,8 +20,8 @@ class SizeUnit(str, Enum):
 
     def to_bytes(self, value: float) -> int:
         if self is SizeUnit.KB:
-            return int(value * 1024)
-        return int(value * 1024 * 1024)
+            return int(value * 1000)
+        return int(value * 1000 * 1000)
 
 
 @dataclass(frozen=True)
