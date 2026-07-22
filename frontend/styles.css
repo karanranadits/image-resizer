@@ -140,16 +140,16 @@ body {
   flex: 1;
   display: flex;
   align-items: center;
-  padding: 60px 32px 60px;
+  padding: 60px 48px 60px;
 }
 
 .hero-center {
-  max-width: 1100px;
+  max-width: 1380px;
   width: 100%;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 72px;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 64px;
   align-items: center;
 }
 
@@ -182,12 +182,12 @@ body {
 }
 
 h1 {
-  font-size: clamp(38px, 4.5vw, 58px);
+  font-size: clamp(42px, 4.8vw, 68px);
   font-weight: 900;
   line-height: 1.06;
   letter-spacing: -2.5px;
   color: var(--text);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .grad-text {
@@ -198,11 +198,11 @@ h1 {
 }
 
 .hero-sub {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.7;
   color: var(--muted);
-  margin-bottom: 30px;
-  max-width: 420px;
+  margin-bottom: 32px;
+  max-width: 500px;
 }
 
 .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -224,8 +224,8 @@ h1 {
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border: 1px solid var(--card-border);
-  border-radius: 24px;
-  padding: 28px;
+  border-radius: 28px;
+  padding: 36px;
   box-shadow: var(--shadow-card);
   transition: background 0.35s, border-color 0.35s, box-shadow 0.35s;
 }
@@ -234,12 +234,12 @@ h1 {
 .dropzone {
   border: 1.5px dashed var(--dropzone-border);
   background: var(--dropzone-bg);
-  border-radius: 16px;
-  padding: 32px 20px;
+  border-radius: 18px;
+  padding: 44px 28px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 .dropzone:hover, .dropzone.dragover {
   border-color: var(--accent);
