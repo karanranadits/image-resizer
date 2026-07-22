@@ -1,4 +1,3 @@
-import base64
 import json
 
 from fastapi import APIRouter, Form, HTTPException, UploadFile
