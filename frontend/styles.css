@@ -309,6 +309,19 @@ input:focus, select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
+/* Fix dropdown popup colors to match theme */
+select option {
+  background-color: var(--input-bg);
+  color: var(--text);
+}
+[data-theme="dark"] select option {
+  background-color: #1a1d2e;
+  color: #f0eeff;
+}
+[data-theme="light"] select option {
+  background-color: #ffffff;
+  color: #0d0c1a;
+}
 
 /* Warning */
 .warning-box {
