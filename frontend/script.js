@@ -3,7 +3,6 @@ const dropzoneContent = document.getElementById('dropzoneContent');
 const fileInput = document.getElementById('fileInput');
 const submitBtn = document.getElementById('submitBtn');
 const submitLabel = document.getElementById('submitLabel');
-const spinner = document.getElementById('spinner');
 const formatSelect = document.getElementById('format');
 const formatWarning = document.getElementById('formatWarning');
 const errorBox = document.getElementById('errorBox');
@@ -13,6 +12,17 @@ const downloadBtn = document.getElementById('downloadBtn');
 let selectedFile = null;
 let resultBlob = null;
 let resultFilename = 'resized-image';
+
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('pixelfit-theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pixelfit-theme', next);
+});
 
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
