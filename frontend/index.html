@@ -12,198 +12,151 @@
 </head>
 <body>
 
-<!-- ===== ANIMATED BACKGROUND ===== -->
-<div class="bg-scene" aria-hidden="true">
-  <!-- Animated gradient blobs -->
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
+<!-- FULL-SCREEN ANIMATED CANVAS BACKGROUND -->
+<canvas id="bgCanvas"></canvas>
 
-  <!-- Particle canvas -->
-  <canvas id="particleCanvas"></canvas>
-
-  <!-- Floating image cards -->
-  <div class="float-cards">
-    <div class="float-card float-card-1">
-      <img src="assets/img1.png" alt="">
-      <div class="float-card-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        3.2 MB → 200 KB
-      </div>
-    </div>
-    <div class="float-card float-card-2">
-      <img src="assets/img2.png" alt="">
-      <div class="float-card-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Exact match ✓
-      </div>
-    </div>
-    <div class="float-card float-card-3">
-      <img src="assets/img3.png" alt="">
-      <div class="float-card-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        1.8 MB → 100 KB
-      </div>
-    </div>
-    <div class="float-card float-card-4">
-      <img src="assets/img4.png" alt="">
-      <div class="float-card-label">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Byte-perfect
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== NAVBAR ===== -->
+<!-- NAVBAR -->
 <header class="navbar">
   <div class="navbar-inner">
     <div class="navbar-logo">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="28" height="28" rx="8" fill="url(#logoGrad)"/>
-        <path d="M8 14C8 10.686 10.686 8 14 8C17.314 8 20 10.686 20 14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="14" cy="17" r="2.5" fill="white"/>
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <rect width="30" height="30" rx="9" fill="url(#lg1)"/>
+        <path d="M9 15C9 11.686 11.686 9 15 9C18.314 9 21 11.686 21 15" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="15" cy="18" r="2.8" fill="white"/>
         <defs>
-          <linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#7C3AED"/>
-            <stop offset="1" stop-color="#EC4899"/>
+          <linearGradient id="lg1" x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#7C3AED"/><stop offset="1" stop-color="#EC4899"/>
           </linearGradient>
         </defs>
       </svg>
       <span class="navbar-brand">PixelFit</span>
     </div>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-      <span class="theme-icon sun-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-      </span>
-      <span class="theme-icon moon-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </span>
+      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
     </button>
   </div>
 </header>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-  <div class="hero-text">
-    <div class="hero-badge">Free &amp; Byte-Precise</div>
-    <h1>Exact image<br>resizer.</h1>
-    <p class="hero-subtitle">Compress any image to a precise target file size — down to the exact byte. No sign-up. No watermarks. Just precision.</p>
-    <div class="hero-features">
-      <div class="hero-feature">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>Byte-perfect output</span>
+<!-- HERO -->
+<main class="page-content">
+  <div class="hero-center">
+    <!-- Left: copy -->
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Free · No watermarks · Byte-precise
       </div>
-      <div class="hero-feature">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>JPEG, PNG &amp; WebP</span>
-      </div>
-      <div class="hero-feature">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>Private &amp; secure</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOOL CARD -->
-  <div class="tool-card" id="toolCard">
-    <div class="dropzone" id="dropzone">
-      <div id="dropzoneContent">
-        <div class="dropzone-icon">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-          </svg>
-        </div>
-        <p class="dropzone-title"><strong>Drag &amp; drop an image</strong><br>or <span class="browse-link">browse to upload</span></p>
-        <p class="dropzone-sub">Supports JPEG, PNG, WebP</p>
-      </div>
-      <input type="file" id="fileInput" accept="image/*" style="display:none">
-    </div>
-
-    <div class="options-grid">
-      <div class="field">
-        <label for="targetSize">Target size</label>
-        <input type="number" id="targetSize" min="0.01" step="0.01" value="200">
-      </div>
-      <div class="field">
-        <label for="unit">Unit</label>
-        <select id="unit">
-          <option value="KB" selected>KB (SI)</option>
-          <option value="KiB">KiB (Binary)</option>
-          <option value="MB">MB (SI)</option>
-          <option value="MiB">MiB (Binary)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="format">Format</label>
-        <select id="format">
-          <option value="jpeg" selected>JPEG</option>
-          <option value="png">PNG</option>
-          <option value="webp">WebP</option>
-        </select>
+      <h1>Resize images<br><span class="grad-text">to the exact byte.</span></h1>
+      <p class="hero-sub">Set any target size in KB or MB — your image comes out exactly that size, down to the last byte. JPEG, PNG, WebP.</p>
+      <div class="pill-row">
+        <div class="pill">✓ Byte-perfect</div>
+        <div class="pill">✓ No sign-up</div>
+        <div class="pill">✓ Fully private</div>
       </div>
     </div>
 
-    <div class="warning-box" id="formatWarning"></div>
+    <!-- Right: tool -->
+    <div class="tool-card">
 
-    <button id="submitBtn" disabled>
-      <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span id="submitLabel">Select an image first</span>
-    </button>
-
-    <div class="progress-container" id="progressContainer">
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <div class="progress-text">
-        <span id="progressStatus">Preparing...</span>
-        <span id="progressEta"></span>
-      </div>
-    </div>
-
-    <div class="error-box" id="errorBox"></div>
-
-    <div class="result" id="result">
-      <div class="result-header">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Resize complete
-      </div>
-      <div class="result-stats">
-        <div class="stat">
-          <div class="stat-label">Original</div>
-          <div class="stat-value" id="originalSize">—</div>
+      <!-- Drop Zone -->
+      <div class="dropzone" id="dropzone">
+        <div id="dropzoneContent">
+          <div class="dz-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </div>
+          <p class="dz-headline">Drag &amp; drop your image</p>
+          <p class="dz-sub">or <span class="browse-link">click to browse</span> &nbsp;·&nbsp; JPEG / PNG / WebP</p>
         </div>
-        <div class="stat-arrow">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <input type="file" id="fileInput" accept="image/*" style="display:none">
+      </div>
+
+      <!-- Options -->
+      <div class="options-grid">
+        <div class="field">
+          <label for="targetSize">Target size</label>
+          <input type="number" id="targetSize" min="0.01" step="0.01" value="200">
         </div>
-        <div class="stat">
-          <div class="stat-label">Achieved</div>
-          <div class="stat-value highlight" id="achievedSize">—</div>
+        <div class="field">
+          <label for="unit">Unit</label>
+          <select id="unit">
+            <option value="KB" selected>KB (1000 b, SI)</option>
+            <option value="KiB">KiB (1024 b, Bin)</option>
+            <option value="MB">MB (1000² SI)</option>
+            <option value="MiB">MiB (1024² Bin)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="format">Format</label>
+          <select id="format">
+            <option value="jpeg" selected>JPEG</option>
+            <option value="png">PNG</option>
+            <option value="webp">WebP</option>
+          </select>
         </div>
       </div>
-      <div class="result-meta">
-        <span class="result-label">Target: <strong id="targetSizeDisplay">—</strong></span>
-        <span id="matchBadge">—</span>
-      </div>
-      <div id="resultWarnings"></div>
-      <button class="download-btn" id="downloadBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
-        Download image
+
+      <div class="warning-box" id="formatWarning"></div>
+
+      <button id="submitBtn" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span id="submitLabel">Select an image to start</span>
       </button>
+
+      <!-- Progress -->
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-text">
+          <span id="progressStatus">Preparing…</span>
+          <span id="progressEta"></span>
+        </div>
+      </div>
+
+      <div class="error-box" id="errorBox"></div>
+
+      <!-- Result -->
+      <div class="result" id="result">
+        <div class="result-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Resize complete
+        </div>
+        <div class="result-stats">
+          <div class="stat">
+            <div class="stat-label">Original</div>
+            <div class="stat-value" id="originalSize">—</div>
+          </div>
+          <div class="stat-arrow">→</div>
+          <div class="stat">
+            <div class="stat-label">Achieved</div>
+            <div class="stat-value grad-text" id="achievedSize">—</div>
+          </div>
+        </div>
+        <div class="result-meta">
+          <span>Target: <strong id="targetSizeDisplay">—</strong></span>
+          <span id="matchBadge"></span>
+        </div>
+        <div id="resultWarnings"></div>
+        <button class="download-btn" id="downloadBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+          Download image
+        </button>
+      </div>
     </div>
   </div>
-</section>
+</main>
 
 <footer class="footer">
-  <p>Pixel-perfect compression · No data stored · Free forever</p>
+  <p>Pixel-perfect · Private · No limits · Free forever</p>
 </footer>
 
 <script src="config.js"></script>

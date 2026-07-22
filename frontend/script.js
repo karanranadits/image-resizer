@@ -24,14 +24,28 @@ themeToggle.addEventListener('click', () => {
   localStorage.setItem('pixelfit-theme', next);
 });
 
-// ── Particle Canvas ──────────────────────────────────
-(function initParticles() {
-  const canvas = document.getElementById('particleCanvas');
+// ═══════════════════════════════════════════════
+//  FULL-SCREEN GEOMETRIC MESH BACKGROUND
+// ═══════════════════════════════════════════════
+(function initGeoBg() {
+  const canvas = document.getElementById('bgCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  let W, H, particles = [];
-  const COUNT = 55;
+  let W, H, t = 0;
+
+  // Grid config
+  const COLS = 14;      // vertical lines
+  const ROWS = 9;       // horizontal lines
+  const DIAG_SPEED = 0.18; // diagonal scroll speed (px/frame)
+
+  // Streaks: glowing beams traveling along grid lines
+  const streaks = [];
+  const STREAK_COUNT = 6;
+
+  function isDark() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+  }
 
   function resize() {
     W = canvas.width  = window.innerWidth;
@@ -40,49 +54,154 @@ themeToggle.addEventListener('click', () => {
   window.addEventListener('resize', resize);
   resize();
 
-  function rand(min, max) { return Math.random() * (max - min) + min; }
-
-  function makeParticle() {
+  // Build initial streaks
+  function makeStreak() {
+    const horizontal = Math.random() > 0.4; // bias horizontal slightly
     return {
-      x: rand(0, W),
-      y: rand(0, H),
-      r: rand(1.2, 3.2),
-      vx: rand(-0.25, 0.25),
-      vy: rand(-0.3, -0.08),
-      alpha: rand(0.2, 0.6),
+      horizontal,
+      // which grid line index it travels on (fractional for smooth creation)
+      track: Math.floor(Math.random() * (horizontal ? ROWS : COLS)),
+      pos: Math.random() * (horizontal ? W : H),  // current position along the line
+      speed: (1 + Math.random() * 2.5) * (Math.random() > 0.5 ? 1 : -1),
+      len: 60 + Math.random() * 140,   // streak length in px
+      alpha: 0.6 + Math.random() * 0.4,
+      width: 1.5 + Math.random() * 1.5,
     };
   }
 
-  for (let i = 0; i < COUNT; i++) particles.push(makeParticle());
-
-  function getAccentColor() {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return isDark ? '180, 120, 255' : '124, 58, 237';
+  for (let i = 0; i < STREAK_COUNT; i++) {
+    const s = makeStreak();
+    // Spread initial positions
+    s.pos = Math.random() * (s.horizontal ? W : H);
+    streaks.push(s);
   }
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    const color = getAccentColor();
-    particles.forEach(p => {
+    t += 1;
+
+    const dark = isDark();
+    const gridColor   = dark ? 'rgba(140, 100, 255, 0.08)' : 'rgba(100, 60, 220, 0.07)';
+    const nodeColor   = dark ? 'rgba(160, 110, 255, 0.22)' : 'rgba(100, 55, 210, 0.16)';
+    const streakColor = dark ? [160, 100, 255] : [100, 50, 220];
+    const accentNode  = dark ? 'rgba(236, 72, 153, 0.35)'  : 'rgba(236, 72, 153, 0.22)';
+
+    // ── 1. Grid — diagonal scrolling offset ──
+    const offX = (t * DIAG_SPEED) % (W / COLS);
+    const offY = (t * DIAG_SPEED * 0.6) % (H / ROWS);
+
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+
+    // Vertical lines (scroll horizontally)
+    for (let c = -1; c <= COLS + 1; c++) {
+      const x = (c * (W / COLS) + offX) % (W + W / COLS) - W / COLS;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${color}, ${p.alpha})`;
-      ctx.fill();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
+      ctx.stroke();
+    }
 
-      p.x += p.vx;
-      p.y += p.vy;
-      p.alpha += rand(-0.003, 0.003);
-      p.alpha = Math.max(0.1, Math.min(0.65, p.alpha));
+    // Horizontal lines (scroll vertically)
+    for (let r = -1; r <= ROWS + 1; r++) {
+      const y = (r * (H / ROWS) + offY) % (H + H / ROWS) - H / ROWS;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
+      ctx.stroke();
+    }
 
-      // wrap around
-      if (p.y < -10) { p.y = H + 10; p.x = rand(0, W); }
-      if (p.x < -10) p.x = W + 10;
-      if (p.x > W + 10) p.x = -10;
+    // ── 2. Intersection dots ──
+    for (let c = -1; c <= COLS + 1; c++) {
+      for (let r = -1; r <= ROWS + 1; r++) {
+        const x = (c * (W / COLS) + offX) % (W + W / COLS) - W / COLS;
+        const y = (r * (H / ROWS) + offY) % (H + H / ROWS) - H / ROWS;
+
+        // pulse radius via sine
+        const pulse = Math.sin(t * 0.04 + c * 0.7 + r * 0.9) * 0.5 + 0.5;
+        const r0 = 1.5 + pulse * 1.5;
+
+        // Accent every ~4th node
+        const isAccent = (c + r) % 4 === 0;
+        ctx.beginPath();
+        ctx.arc(x, y, r0, 0, Math.PI * 2);
+        ctx.fillStyle = isAccent ? accentNode : nodeColor;
+        ctx.fill();
+      }
+    }
+
+    // ── 3. Moving streaks ──
+    streaks.forEach(s => {
+      s.pos += s.speed;
+
+      // Reset when off-screen
+      const bound = s.horizontal ? W : H;
+      if (s.speed > 0 && s.pos > bound + s.len) {
+        s.pos = -s.len;
+        s.track = Math.floor(Math.random() * (s.horizontal ? ROWS : COLS));
+        s.speed = (1 + Math.random() * 2.5);
+        s.len = 60 + Math.random() * 140;
+      }
+      if (s.speed < 0 && s.pos < -s.len) {
+        s.pos = bound + s.len;
+        s.track = Math.floor(Math.random() * (s.horizontal ? ROWS : COLS));
+        s.speed = -(1 + Math.random() * 2.5);
+        s.len = 60 + Math.random() * 140;
+      }
+
+      // Compute pixel coordinate for this streak's grid line
+      if (s.horizontal) {
+        const lineY = (s.track * (H / ROWS) + offY) % (H + H / ROWS) - H / ROWS;
+        const x0 = s.pos - s.len / 2;
+        const x1 = s.pos + s.len / 2;
+
+        const grad = ctx.createLinearGradient(x0, lineY, x1, lineY);
+        grad.addColorStop(0,    `rgba(${streakColor},0)`);
+        grad.addColorStop(0.5,  `rgba(${streakColor},${s.alpha})`);
+        grad.addColorStop(1,    `rgba(${streakColor},0)`);
+
+        ctx.beginPath();
+        ctx.moveTo(x0, lineY);
+        ctx.lineTo(x1, lineY);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = s.width;
+        ctx.stroke();
+
+        // Glow dot at head
+        ctx.beginPath();
+        ctx.arc(s.pos, lineY, s.width * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${streakColor},${s.alpha * 0.9})`;
+        ctx.fill();
+      } else {
+        const lineX = (s.track * (W / COLS) + offX) % (W + W / COLS) - W / COLS;
+        const y0 = s.pos - s.len / 2;
+        const y1 = s.pos + s.len / 2;
+
+        const grad = ctx.createLinearGradient(lineX, y0, lineX, y1);
+        grad.addColorStop(0,    `rgba(${streakColor},0)`);
+        grad.addColorStop(0.5,  `rgba(${streakColor},${s.alpha})`);
+        grad.addColorStop(1,    `rgba(${streakColor},0)`);
+
+        ctx.beginPath();
+        ctx.moveTo(lineX, y0);
+        ctx.lineTo(lineX, y1);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = s.width;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(lineX, s.pos, s.width * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${streakColor},${s.alpha * 0.9})`;
+        ctx.fill();
+      }
     });
+
     requestAnimationFrame(draw);
   }
+
   draw();
 })();
+
 
 
 dropzone.addEventListener('click', () => fileInput.click());
