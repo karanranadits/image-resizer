@@ -54,9 +54,10 @@ class JpegPadder(Padder):
             raise ValueError("Not a valid JPEG (missing SOI marker); cannot pad.")
         if 0 < needed < self.MIN_SEGMENT_OVERHEAD:
             # Can't express 1-3 spare bytes with a real COM segment (min
-            # overhead is 4 bytes). Round up to the smallest valid segment;
-            # caller tolerates being a few bytes over rather than under.
-            needed = self.MIN_SEGMENT_OVERHEAD
+            # overhead is 4 bytes). Instead of rounding up and exceeding
+            # the target size (which causes OS rounding to next KB), we
+            # append trailing null bytes after the EOI marker.
+            return current_bytes + (b"\x00" * needed)
 
         padding_blob = self._build_segment_chain(needed)
         return current_bytes[: len(self.SOI)] + padding_blob + current_bytes[len(self.SOI):]
@@ -119,8 +120,9 @@ class PngPadder(Padder):
             raise ValueError("Not a valid PNG (missing signature); cannot pad.")
         if 0 < needed < self.CHUNK_OVERHEAD:
             # Can't express a gap smaller than one chunk's overhead (12
-            # bytes). Round up; caller tolerates a few bytes over target.
-            needed = self.CHUNK_OVERHEAD
+            # bytes). Instead of rounding up, we append trailing null bytes
+            # to the end of the file (after IEND).
+            return current_bytes + (b"\x00" * needed)
 
         insert_at = self._find_ihdr_end(current_bytes)
         payload_size = needed - self.CHUNK_OVERHEAD
