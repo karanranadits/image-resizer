@@ -33,17 +33,28 @@ function handleFile(file) {
   }
   selectedFile = file;
   hideError();
+  updateFilePreview();
+  submitBtn.disabled = false;
+  submitLabel.textContent = 'Resize image';
+}
+
+function updateFilePreview() {
+  if (!selectedFile) return;
   const reader = new FileReader();
   reader.onload = (e) => {
     dropzoneContent.innerHTML = `
       <img src="${e.target.result}" alt="preview">
-      <div class="filename">${file.name} (${formatBytes(file.size)})</div>
+      <div class="filename">${selectedFile.name} (${formatBytes(selectedFile.size)})</div>
     `;
   };
-  reader.readAsDataURL(file);
-  submitBtn.disabled = false;
-  submitLabel.textContent = 'Resize image';
+  reader.readAsDataURL(selectedFile);
 }
+
+document.getElementById('unit').addEventListener('change', () => {
+  updateFilePreview();
+  // Also hide result box since unit changed and the old result is now stale
+  resultBox.classList.remove('visible');
+});
 
 formatSelect.addEventListener('change', () => {
   if (formatSelect.value !== 'jpeg') {
@@ -158,7 +169,13 @@ function hideError() {
 }
 
 function formatBytes(bytes) {
-  if (bytes < 1000) return `${bytes} B`;
-  if (bytes < 1000 * 1000) return `${(bytes / 1000).toFixed(2)} KB`;
-  return `${(bytes / (1000 * 1000)).toFixed(2)} MB`;
+  const unitStr = document.getElementById('unit').value;
+  const isBinary = unitStr === 'KiB' || unitStr === 'MiB';
+  const base = isBinary ? 1024 : 1000;
+  const kLabel = isBinary ? 'KiB' : 'KB';
+  const mLabel = isBinary ? 'MiB' : 'MB';
+
+  if (bytes < base) return `${bytes} B`;
+  if (bytes < base * base) return `${(bytes / base).toFixed(2)} ${kLabel}`;
+  return `${(bytes / (base * base)).toFixed(2)} ${mLabel}`;
 }

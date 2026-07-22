@@ -16,12 +16,20 @@ class ImageFormat(str, Enum):
 
 class SizeUnit(str, Enum):
     KB = "KB"
+    KiB = "KiB"
     MB = "MB"
+    MiB = "MiB"
 
     def to_bytes(self, value: float) -> int:
         if self is SizeUnit.KB:
             return int(value * 1000)
-        return int(value * 1000 * 1000)
+        elif self is SizeUnit.KiB:
+            return int(value * 1024)
+        elif self is SizeUnit.MB:
+            return int(value * 1000 * 1000)
+        elif self is SizeUnit.MiB:
+            return int(value * 1024 * 1024)
+        return int(value * 1000)
 
 
 @dataclass(frozen=True)
