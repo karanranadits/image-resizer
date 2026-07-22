@@ -89,19 +89,57 @@ submitBtn.addEventListener('click', async () => {
   formData.append('output_format', format);
 
   try {
-    const response = await fetch(`${CONFIG.API_BASE}/resize`, {
-      method: 'POST',
-      body: formData
+    const { blob, metadata } = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      let startTime = Date.now();
+
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+          const percent = (e.loaded / e.total) * 100;
+          document.getElementById('progressFill').style.width = percent + '%';
+          document.getElementById('progressFill').classList.remove('processing');
+          
+          if (percent === 100) {
+            document.getElementById('progressStatus').textContent = 'Resizing image...';
+            document.getElementById('progressEta').textContent = '';
+            document.getElementById('progressFill').classList.add('processing');
+          } else {
+            document.getElementById('progressStatus').textContent = 'Uploading...';
+            const elapsed = (Date.now() - startTime) / 1000;
+            const speed = e.loaded / elapsed;
+            const remaining = (e.total - e.loaded) / speed;
+            document.getElementById('progressEta').textContent = 
+              isFinite(remaining) && remaining > 0 ? `ETA: ${Math.ceil(remaining)}s` : '';
+          }
+        }
+      });
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const metadataHeader = xhr.getResponseHeader('X-Resize-Metadata');
+          const metadata = metadataHeader ? JSON.parse(metadataHeader) : null;
+          resolve({ blob: xhr.response, metadata });
+        } else {
+          // If error, the response is a Blob containing the JSON error
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const errData = JSON.parse(reader.result);
+              reject(new Error(errData.detail || 'Request failed.'));
+            } catch {
+              reject(new Error('Request failed.'));
+            }
+          };
+          reader.readAsText(xhr.response);
+        }
+      });
+
+      xhr.addEventListener('error', () => reject(new Error('Network error.')));
+      
+      xhr.open('POST', `${CONFIG.API_BASE}/resize`);
+      xhr.responseType = 'blob';
+      xhr.send(formData);
     });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({ detail: 'Request failed.' }));
-      throw new Error(errData.detail || 'Request failed.');
-    }
-
-    const metadataHeader = response.headers.get('X-Resize-Metadata');
-    const metadata = metadataHeader ? JSON.parse(metadataHeader) : null;
-    const blob = await response.blob();
 
     resultBlob = blob;
     resultFilename = `resized.${format}`;
@@ -156,8 +194,16 @@ function displayResult(metadata) {
 
 function setLoading(isLoading) {
   submitBtn.disabled = isLoading;
-  submitLabel.style.display = isLoading ? 'none' : 'inline';
-  spinner.classList.toggle('visible', isLoading);
+  const container = document.getElementById('progressContainer');
+  if (isLoading) {
+    container.classList.add('visible');
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressFill').classList.remove('processing');
+    document.getElementById('progressStatus').textContent = 'Preparing...';
+    document.getElementById('progressEta').textContent = '';
+  } else {
+    container.classList.remove('visible');
+  }
 }
 
 function showError(msg) {

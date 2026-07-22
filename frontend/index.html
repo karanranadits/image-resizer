@@ -50,8 +50,17 @@
 
   <button id="submitBtn" disabled>
     <span id="submitLabel">Select an image first</span>
-    <div class="spinner" id="spinner"></div>
   </button>
+
+  <div class="progress-container" id="progressContainer">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-text">
+      <span id="progressStatus">Uploading...</span>
+      <span id="progressEta"></span>
+    </div>
+  </div>
 
   <div class="error-box" id="errorBox"></div>
 
