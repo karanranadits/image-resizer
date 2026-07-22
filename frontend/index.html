@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exact Image Resizer — Resize to the Byte</title>
+<title>PixelFit — Exact Image Resizer</title>
 <meta name="description" content="Compress and resize any image to a precise file size in KB or MB — guaranteed to the exact byte. Free, fast, and private.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,50 @@
 </head>
 <body>
 
-<!-- Top Navigation Bar -->
+<!-- ===== ANIMATED BACKGROUND ===== -->
+<div class="bg-scene" aria-hidden="true">
+  <!-- Animated gradient blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Floating image cards -->
+  <div class="float-cards">
+    <div class="float-card float-card-1">
+      <img src="assets/img1.png" alt="">
+      <div class="float-card-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        3.2 MB → 200 KB
+      </div>
+    </div>
+    <div class="float-card float-card-2">
+      <img src="assets/img2.png" alt="">
+      <div class="float-card-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Exact match ✓
+      </div>
+    </div>
+    <div class="float-card float-card-3">
+      <img src="assets/img3.png" alt="">
+      <div class="float-card-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        1.8 MB → 100 KB
+      </div>
+    </div>
+    <div class="float-card float-card-4">
+      <img src="assets/img4.png" alt="">
+      <div class="float-card-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Byte-perfect
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NAVBAR ===== -->
 <header class="navbar">
   <div class="navbar-inner">
     <div class="navbar-logo">
@@ -33,14 +76,10 @@
       <span class="theme-icon sun-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       </span>
       <span class="theme-icon moon-icon">
@@ -52,11 +91,11 @@
   </div>
 </header>
 
-<!-- Hero Section -->
+<!-- ===== HERO ===== -->
 <section class="hero">
   <div class="hero-text">
-    <div class="hero-badge">Free &amp; Precise</div>
-    <h1>Exact image resizer.</h1>
+    <div class="hero-badge">Free &amp; Byte-Precise</div>
+    <h1>Exact image<br>resizer.</h1>
     <p class="hero-subtitle">Compress any image to a precise target file size — down to the exact byte. No sign-up. No watermarks. Just precision.</p>
     <div class="hero-features">
       <div class="hero-feature">
@@ -74,14 +113,13 @@
     </div>
   </div>
 
+  <!-- TOOL CARD -->
   <div class="tool-card" id="toolCard">
-    <!-- Drop Zone -->
     <div class="dropzone" id="dropzone">
       <div id="dropzoneContent">
         <div class="dropzone-icon">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
           </svg>
         </div>
         <p class="dropzone-title"><strong>Drag &amp; drop an image</strong><br>or <span class="browse-link">browse to upload</span></p>
@@ -90,7 +128,6 @@
       <input type="file" id="fileInput" accept="image/*" style="display:none">
     </div>
 
-    <!-- Options Row -->
     <div class="options-grid">
       <div class="field">
         <label for="targetSize">Target size</label>
@@ -99,10 +136,10 @@
       <div class="field">
         <label for="unit">Unit</label>
         <select id="unit">
-          <option value="KB" selected>KB (1000 bytes, SI)</option>
-          <option value="KiB">KiB (1024 bytes, Binary)</option>
-          <option value="MB">MB (1000² bytes, SI)</option>
-          <option value="MiB">MiB (1024² bytes, Binary)</option>
+          <option value="KB" selected>KB (SI)</option>
+          <option value="KiB">KiB (Binary)</option>
+          <option value="MB">MB (SI)</option>
+          <option value="MiB">MiB (Binary)</option>
         </select>
       </div>
       <div class="field">
@@ -117,13 +154,11 @@
 
     <div class="warning-box" id="formatWarning"></div>
 
-    <!-- CTA Button -->
     <button id="submitBtn" disabled>
       <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="21 15 21 21 3 21 3 15"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       <span id="submitLabel">Select an image first</span>
     </button>
 
-    <!-- Progress Bar -->
     <div class="progress-container" id="progressContainer">
       <div class="progress-track">
         <div class="progress-fill" id="progressFill"></div>
@@ -136,11 +171,10 @@
 
     <div class="error-box" id="errorBox"></div>
 
-    <!-- Result Panel -->
     <div class="result" id="result">
       <div class="result-header">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>Resize complete</span>
+        Resize complete
       </div>
       <div class="result-stats">
         <div class="stat">
@@ -168,7 +202,6 @@
   </div>
 </section>
 
-<!-- Footer -->
 <footer class="footer">
   <p>Pixel-perfect compression · No data stored · Free forever</p>
 </footer>

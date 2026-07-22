@@ -24,6 +24,67 @@ themeToggle.addEventListener('click', () => {
   localStorage.setItem('pixelfit-theme', next);
 });
 
+// ── Particle Canvas ──────────────────────────────────
+(function initParticles() {
+  const canvas = document.getElementById('particleCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let W, H, particles = [];
+  const COUNT = 55;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function makeParticle() {
+    return {
+      x: rand(0, W),
+      y: rand(0, H),
+      r: rand(1.2, 3.2),
+      vx: rand(-0.25, 0.25),
+      vy: rand(-0.3, -0.08),
+      alpha: rand(0.2, 0.6),
+    };
+  }
+
+  for (let i = 0; i < COUNT; i++) particles.push(makeParticle());
+
+  function getAccentColor() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return isDark ? '180, 120, 255' : '124, 58, 237';
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const color = getAccentColor();
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${color}, ${p.alpha})`;
+      ctx.fill();
+
+      p.x += p.vx;
+      p.y += p.vy;
+      p.alpha += rand(-0.003, 0.003);
+      p.alpha = Math.max(0.1, Math.min(0.65, p.alpha));
+
+      // wrap around
+      if (p.y < -10) { p.y = H + 10; p.x = rand(0, W); }
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
